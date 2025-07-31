@@ -1,0 +1,275 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="./js/echarts.min.js"></script>
+		<script src="./js/china.js"></script>
+		<script src="./js/china_boundary.js"></script>
+		<title>地图外边框轮廓+伪3D地图效果</title>
+		<style>
+			body {
+			            background-color: #0E2056;
+			            background-size: 50px 50px;
+			            background-image: linear-gradient(90deg, #0F225B 2px, transparent 2px, transparent 2px),
+			                linear-gradient(#0F225B, #0F225B 2px, transparent 2px, transparent 2px);
+			        }
+			        #map_tips span{
+			            width:25%;
+			            display: inline-block;
+			            text-align: center;
+			            height:30px;
+			            line-height: 30px;
+			            vertical-align: middle;
+			        }
+			        #map_tips span img{
+			            width:25px;
+			            height:8px;
+			            
+			        }
+			        #map_tips span img:first-child{
+			            margin-right:15px;
+			        }
+			
+			        #map_tips span img:last-child{
+			            margin-left:15px;
+			            transform:rotateY(180deg);
+			        }
+		</style>
+	</head>
+
+	<body>
+		<div>
+			<!-- 预先加载，避免等待 -->
+			<img id="backImg" src="./images/background_image.jpg" style="display:none">
+			<div id="map" style="height: 800px; width: 800px; margin: auto; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1753948223565">
+				<div style="position: relative; width: 800px; height: 800px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;">
+					<canvas data-zr-dom-id="zr_0" width="800" height="800" style="position: absolute; left: 0px; top: 0px; width: 800px; height: 800px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
+				</div>
+				<div class="" style="position: absolute; display: block; border-style: solid; white-space: nowrap; z-index: 9999999; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; transition: opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1), visibility 0.2s cubic-bezier(0.23, 1, 0.32, 1), transform 0.4s cubic-bezier(0.23, 1, 0.32, 1); background-color: rgba(0, 0, 0, 0); border-width: 1px; border-radius: 4px; color: rgb(102, 102, 102); font: 14px / 21px &quot;Microsoft YaHei&quot;; padding: 0px; top: 0px; left: 0px; transform: translate3d(68px, 375px, 0px); border-color: rgb(84, 112, 198); pointer-events: none; visibility: hidden; opacity: 0;">
+					<div id="map_tips" style="background-image:url(./images/tips_background.png);background-size:100%;width:325px;height:192px;color:white;padding:10px;
+                             z-index: 9999;">
+						<div style="height:30px;font-size: 18px;font-weight: bold; width:100%;margin-bottom: 5px;">
+							<span style="width: 100%;">
+								<img src="./images/tip_logo.png">四川省
+								<img src="./images/tip_logo.png">
+							</span>
+						</div>
+						<div style="display:inline-block;height:30px;color:rgba(54, 245, 203, 1);width:100%;">
+							<span>任务类型</span>
+							<span>已完成</span>
+							<span>进行中</span>
+							<span>延期</span>
+						</div>
+						<div style="background: #104347">
+							<span>任务1</span>
+							<span>6</span>
+							<span>6</span>
+							<span>6</span>
+						</div>
+						<div>
+							<span>任务2</span>
+							<span>3</span>
+							<span>3</span>
+							<span>3</span>
+						</div>
+						<div style="background: #104347">
+							<span>任务3</span>
+							<span>3</span>
+							<span>3</span>
+							<span>3</span>
+						</div>
+						<div>
+							<span>总计</span>
+							<span>3</span>
+							<span>3</span>
+							<span>3</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			const image = new Image();
+			        image.src = "./images/background_image.jpg";
+			        image.onload = function() {
+			            // 获取地图元素
+			            const echartContainer = document.getElementById('map');
+			            // 创建临时元素
+			            const canvasBackgroundImg = document.createElement('canvas');
+			            //重新裁剪图片，适应元素宽高
+			            canvasBackgroundImg.width = echartContainer.clientWidth;
+			            canvasBackgroundImg.height = echartContainer.clientHeight;
+			            const ctx = canvasBackgroundImg.getContext('2d');
+			            ctx.drawImage(image,0,0, echartContainer.clientWidth, echartContainer.clientHeight);
+			
+			            //加载echart 配置
+			            loadEchartConfig(canvasBackgroundImg)
+			        };
+			
+			        function loadEchartConfig(canvasBackgroundImg){
+			            var optionMap = {
+			                tooltip: {
+			                    trigger: 'item',
+			                    backgroundColor: 'rgba(0,0,0,0)',
+			                    padding: 0,
+			                    margin: 0,
+			                    formatter:function(params){
+			                        var name = params.name;
+			                        return `
+			                        <div id="map_tips" style="background-image:url(./images/tips_background.png);background-size:100%;width:325px;height:192px;color:white;padding:10px;
+			                             z-index: 9999;">
+			                                <div style="height:30px;font-size: 18px;font-weight: bold; width:100%;margin-bottom: 5px;">
+			                                    <span style="width: 100%;"><img src="./images/tip_logo.png">${name}<img src="./images/tip_logo.png"></span></span>
+			                                </div>
+			                                <div style="display:inline-block;height:30px;color:rgba(54, 245, 203, 1);width:100%;">
+			                                    <span>任务类型</span><span>已完成</span><span>进行中</span><span>延期</span>
+			                                </div>
+			                                <div style="background: #104347">
+			                                    <span >任务1</span><span>6</span><span>6</span><span>6</span>
+			                                </div>
+			                                <div>
+			                                    <span>任务2</span><span>3</span><span>3</span><span>3</span>
+			                                </div>
+			                                <div style="background: #104347">
+			                                    <span>任务3</span><span>3</span><span>3</span><span>3</span>
+			                                </div>
+			                                <div>
+			                                    <span>总计</span><span>3</span><span>3</span><span>3</span>
+			                                </div>
+			                            </div>`
+			                    }
+			                },
+			                geo: [
+			                {
+			                    map: 'china_boundary',
+			                    silent: true,
+			                    top:90,
+			                    itemStyle: {
+			                        normal: {
+			                            areaColor: new echarts.graphic.LinearGradient(0, 0, 1, 0,[{
+			                                    offset: 0, color: 'rgba(35, 205, 247, 1)' // 0% 处的颜色
+			                                }, {
+			                                    offset: 0.05, color: 'rgba(11, 60, 137, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.1, color: 'rgba(35, 197, 250, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.15, color: 'rgba(0, 60, 115, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.2, color: 'rgba(36, 208, 251, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.25, color: 'rgba(1, 31, 77, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.3, color: 'rgba(35, 236, 249, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.35, color: 'rgba(1, 30, 76, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.4, color: 'rgba(35, 223, 251, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.45, color: 'rgba(1, 33, 84, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.5, color: 'rgba(36, 194, 252, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.55, color: 'rgba(0, 25, 63, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.6, color: 'rgba(36, 209, 252, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.65, color: 'rgba(0, 25, 66, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.7, color: 'rgba(35, 208, 251, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.75, color: 'rgba(4, 44, 106, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.8, color: 'rgba(35, 207, 250, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.85, color: 'rgba(0, 37, 94, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.9, color: 'rgba(35, 145, 251, 1)' // 100% 处的颜色
+			                                },{
+			                                    offset: 0.95, color: 'rgba(18, 152, 191, 1)' // 100% 处的颜色
+			                                }])
+			                            }
+			                        }
+			                    },
+			                    
+			                    {
+			                        map: 'china_boundary',
+			                        //避免边框选中，设置不响应事件
+			                        silent: true,
+			                        itemStyle: {
+			                            normal: {
+			                                //外边框大小
+			                                borderWidth: 4,
+			                                borderColor: 'rgba(54, 245, 203, 1)',
+			                                shadowColor: 'rgba(54, 245, 203, 1)',
+			                                //发光效果
+			                                shadowBlur: 30,
+			                                areaColor: "rgba(0, 0, 0,0)"
+			                            },
+			                            emphasis: {
+			                                label: { show: false },
+			                                areaColor: "rgba(0, 0, 0,0)",
+			                            }
+			                        }
+			                    },{
+			                        map: 'china',
+			                        silent: true,
+			                        //地图区域的多边形 图形样式
+			                        itemStyle: {
+			                            normal: {
+			                                label: { show: false },
+			                                areaColor: {
+			                                    image: canvasBackgroundImg.toDataURL('image/png'),
+			                                    repeat: 'no-repeat'
+			                                },
+			                                borderWidth: 1,
+			                                borderColor: 'rgba(1, 139, 123,1)',
+			                                shadowColor: 'rgba(1, 139, 123,0.4)',
+			                                shadowBlur: 10
+			                            },
+			                            //是图形在高亮状态下的样式,比如在鼠标悬浮或者图例联动高亮时
+			                            emphasis: {
+			                                label: { show: false },
+			                                borderWidth: 2,
+			                                borderColor: 'rgba(253, 132, 2,1)',
+			                                shadowColor: 'rgba(253, 132, 2,1)',
+			                                shadowBlur: 2,
+			                                areaColor: "rgba(253, 132, 2,0.2)",
+			                            }
+			                        }
+			                    },
+			                ],
+			                //配置属性
+			                series: [{
+			                        type: 'map',
+			                        mapType: 'china',
+			                        //地图区域的多边形 图形样式
+			                        itemStyle: {
+			                            normal: {
+			                                label: { show: false },
+			                                areaColor: "rgba(0, 94, 165,0)",
+			                                borderWidth: 0,
+			                                borderColor: 'rgba(1, 139, 123,1)',
+			                                shadowColor: 'rgba(1, 139, 123,0.4)',
+			                                shadowBlur: 10
+			                            },
+			                            emphasis: {
+			                                label: { show: false },
+			                                borderWidth: 2,
+			                                borderColor: 'rgba(253, 132, 2,1)',
+			                                shadowColor: 'rgba(253, 132, 2,1)',
+			                                shadowBlur: 2,
+			                                areaColor: "rgba(253, 132, 2,0.2)",
+			                            }
+			                        },
+			                    },]
+			            };
+			
+			            //初始化echarts实例
+			            var myChart = echarts.init(document.getElementById('map'));
+			            //使用制定的配置项和数据显示图表
+			            myChart.setOption(optionMap);
+			        };
+		</script>
+
+
+	</body>
+</html>
